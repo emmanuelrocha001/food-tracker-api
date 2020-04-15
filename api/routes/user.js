@@ -69,7 +69,7 @@ router.post('/login', (req, res, next) => {
       if (user.length < 1) {
         return res.status(409).json({
           successful: false,
-          message: 'Authentication failed, the email provided is not linked to an existing account.'
+          message: 'The email provided is not linked to an existing account.'
         });
       }
       else {
@@ -88,7 +88,7 @@ router.post('/login', (req, res, next) => {
           } else {
             return res.status(401).json({
               successful: false,
-              message: 'Authentication failed, incorrect password.'
+              message: 'Incorrect password.'
             });
           }
         });
