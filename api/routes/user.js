@@ -32,6 +32,7 @@ router.post('/signup', (req, res, next) => {
               email: req.body.email,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
+              profilePic: req.body.profilePic,
               password: hash
             });
 
@@ -79,8 +80,10 @@ router.post('/login', (req, res, next) => {
               successful: true,
               user: {
                 name: user[0].firstName,
+                lastName: user[0].lastName,
                 userId: user[0]._id,
-                email: user[0].email
+                email: user[0].email,
+                profilePic: user[0].profilePic
               },
               message: 'Authentication successful',
             });
