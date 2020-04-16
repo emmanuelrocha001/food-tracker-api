@@ -14,8 +14,12 @@ const connection = mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6f
     useUnifiedTopology: true
 }
 );
-const storage = new GridFSStorage({db: connection});
-const upload = multer({ storage });
+
+
+const upload = multer({dest: 'uploads/'});
+
+// const storage = new GridFSStorage({db: connection});
+// const upload = multer({ storage });
 
 
 router.post('/signup', upload.single('profilePic'), (req, res, next) => {
