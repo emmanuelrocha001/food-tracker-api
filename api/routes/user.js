@@ -47,7 +47,7 @@ router.post('/signup', upload.single('profilePic'), (req, res, next) => {
               email: req.body.email,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
-              profilePic: req.profilePic,
+              profilePic: req.body.profilePic,
               password: hash
             });
 
@@ -58,7 +58,7 @@ router.post('/signup', upload.single('profilePic'), (req, res, next) => {
                 res.status(201).json({
                   successful: true,
                   userId: result._id,
-                  image: req.profilePic,
+                  image: req.body.profilePic,
                   message: 'user account created successfully',
                 });
 
