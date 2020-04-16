@@ -46,7 +46,7 @@ router.post('/signup', upload.single('profilePic'), (req, res, next) => {
               email: req.body.email,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
-              profilePic: req.body.profilePic,
+              profilePic: req.profilePic,
               password: hash
             });
 
