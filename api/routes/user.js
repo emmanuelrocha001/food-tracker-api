@@ -3,8 +3,22 @@ const router = express.Router();
 const User = require( '../models/user' );
 var bcrypt = require( 'bcryptjs' );
 const mongoose = require('mongoose');
+const Grid = require('gridfs-stream');
+const multer  = require('multer');
+const GridFSStorage = require('multer-gridfs-storage');
+// Grid.mongo = mongoose.mongo;
+//connect database
+const connection = mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6fr.mongodb.net/test?retryWrites=true&w=majority',
+{
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}
+);
+const storage = new GridFSStorage({db: connection});
+const upload = multer({ storage });
 
-router.post('/signup', (req, res, next) => {
+
+router.post('/signup', upload.single('profilePic'), (req, res, next) => {
 
   User.find( {email: req.body.email} )
     .exec()

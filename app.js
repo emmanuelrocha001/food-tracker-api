@@ -6,6 +6,9 @@ const mongoose = require( 'mongoose' );
 const app = express();
 
 const userRoutes = require( './api/routes/user' );
+// const Grid = require('gridfs-stream');
+// const multer  = require('multer');
+// const GridFSStorage = require('multer-gridfs-storage');
 
 //connect database
 mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6fr.mongodb.net/test?retryWrites=true&w=majority',
@@ -14,6 +17,10 @@ mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6fr.mongodb.net/test?
     useUnifiedTopology: true
 }
 );
+
+// create storage engine
+// const storage = new GridFSStorage({db: connection});
+// const upload = multer({ storage });
 
 // Use default node.js promise implementation
 mongoose.Promise = global.Promise;
