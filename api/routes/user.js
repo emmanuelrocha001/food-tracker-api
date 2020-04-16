@@ -40,6 +40,7 @@ router.post('/signup', upload.single('profilePic'), (req, res, next) => {
           } else {
 
             console.log(hash);
+            // console.log(req.profilePic);
 
             const user = new User({
               _id: new mongoose.Types.ObjectId(),
@@ -57,6 +58,7 @@ router.post('/signup', upload.single('profilePic'), (req, res, next) => {
                 res.status(201).json({
                   successful: true,
                   userId: result._id,
+                  image: req.profilePic,
                   message: 'user account created successfully',
                 });
 
