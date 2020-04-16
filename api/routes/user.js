@@ -4,7 +4,7 @@ const User = require( '../models/user' );
 var bcrypt = require( 'bcryptjs' );
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
-const multer  = require('multer');
+// const multer  = require('multer');
 const GridFSStorage = require('multer-gridfs-storage');
 // Grid.mongo = mongoose.mongo;
 //connect database
@@ -16,13 +16,14 @@ const connection = mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6f
 );
 
 
-const upload = multer({dest: 'uploads/'});
+// const upload = multer({dest: 'uploads/'});
 
 // const storage = new GridFSStorage({db: connection});
 // const upload = multer({ storage });
 
 
-router.post('/signup', upload.single('profilePic'), (req, res, next) => {
+router.post('/signup', (req, res, next) => {
+  console.log("hello");
 
   User.find( {email: req.body.email} )
     .exec()
@@ -51,7 +52,7 @@ router.post('/signup', upload.single('profilePic'), (req, res, next) => {
               email: req.body.email,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
-              profilePic: req.body.profilePic,
+              avatar: req.body.avatar,
               password: hash
             });
 
@@ -62,7 +63,6 @@ router.post('/signup', upload.single('profilePic'), (req, res, next) => {
                 res.status(201).json({
                   successful: true,
                   userId: result._id,
-                  image: req.body.profilePic,
                   message: 'user account created successfully',
                 });
 
@@ -103,7 +103,6 @@ router.post('/login', (req, res, next) => {
                 lastName: user[0].lastName,
                 userId: user[0]._id,
                 email: user[0].email,
-                profilePic: user[0].profilePic
               },
               message: 'Authentication successful',
             });
