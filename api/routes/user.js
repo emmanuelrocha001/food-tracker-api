@@ -3,11 +3,6 @@ const aws = require('aws-sdk');
 // const S3_BUCKET = process.env.S3_BUCKET;
 const s3 = new aws.S3();
 aws.config.region = 'us-east-2';
-// aws.config.update({
-//   accessKeyId: 'AKIAIWZMFGDLGMOYDWTA',
-//   secretAccessKey: '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'
-// });
-
 
 // for deployment
 aws.config.update({
