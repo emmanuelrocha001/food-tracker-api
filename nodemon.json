@@ -1,7 +1,6 @@
 {
 
     "env": {
-        "S3_KEY": "AKIAIWZMFGDLGMOYDWTA",
-        "S3_SECRET": "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"
+        "HELLO": "hello"
     }
 }

@@ -59,10 +59,6 @@ const uploads = multer({
 
 })
 
-// const upload = multer({dest: 'uploads/'});
-
-// const storage = new GridFSStorage({db: connection});
-// const upload = multer({ storage });
 
 
 router.post('/signup', uploads.single('avatar'), (req, res, next) => {
