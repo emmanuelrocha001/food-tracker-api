@@ -142,6 +142,7 @@ router.post('/login', (req, res, next) => {
                 name: user[0].firstName,
                 lastName: user[0].lastName,
                 userId: user[0]._id,
+                avatar: user[0].avatar,
                 email: user[0].email,
               },
               message: 'Authentication successful',
