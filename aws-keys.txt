@@ -1,0 +1,8 @@
+Access Key ID:
+AKIAJGGJW7QUOOK2GGNQ
+Secret Access Key:
+XjT6So/3HMuoreIxSnSZhZXTanDitbpSz8pGwJt0
+
+
+heroku config:set AWS_ACCESS_KEY_ID=AKIAJGGJW7QUOOK2GGNQ AWS_SECRET_ACCESS_KEY=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
+heroku config:set S3_BUCKET=food-tracker-api-storage

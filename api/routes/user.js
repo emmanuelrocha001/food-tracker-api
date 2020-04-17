@@ -1,12 +1,26 @@
 const express = require('express');
+const aws = require('aws-sdk');
+// const S3_BUCKET = process.env.S3_BUCKET;
+const s3 = new aws.S3();
+aws.config.region = 'us-east-2';
+aws.config.update({
+  accessKeyId: 'AKIAJGGJW7QUOOK2GGNQ',
+  secretAccessKey: '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'
+});
+
 const router = express.Router();
 const User = require( '../models/user' );
 var bcrypt = require( 'bcryptjs' );
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 const multer  = require('multer');
+var multerS3 = require('multer-s3')
 const GridFSStorage = require('multer-gridfs-storage');
 const path = require('path');
+
+
+
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // execute cb, pass potential error and path
@@ -17,18 +31,31 @@ const storage = multer.diskStorage({
     cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
   }
 });
-// Grid.mongo = mongoose.mongo;
-//connect database
-// const connection = mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6fr.mongodb.net/test?retryWrites=true&w=majority',
-// {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// }
-// );
+
+
+
+
 
 const upload = multer({storage: storage, limits: {
   fileSize: 1024 * 1024 * 5
 }});
+
+
+const uploads = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'food-tracker-api-storage',
+    metadata: function (req, file, cb) {
+      cb(null, {fieldName: file.fieldname});
+    },
+    key: function (req, file, cb) {
+      cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
+    }
+
+  })
+
+
+})
 
 // const upload = multer({dest: 'uploads/'});
 
@@ -36,7 +63,7 @@ const upload = multer({storage: storage, limits: {
 // const upload = multer({ storage });
 
 
-router.post('/signup', upload.single('avatar'), (req, res, next) => {
+router.post('/signup', uploads.single('avatar'), (req, res, next) => {
 
   User.find( {email: req.body.email} )
     .exec()
@@ -59,13 +86,13 @@ router.post('/signup', upload.single('avatar'), (req, res, next) => {
 
             console.log(hash);
             // const base = 'https://food-tracker-api.herokuapp.com'
-
+            var url = 'https://food-tracker-api-storage.s3.us-east-2.amazonaws.com/' + req.file.key;
             const user = new User({
               _id: new mongoose.Types.ObjectId(),
               email: req.body.email,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
-              avatar: req.file.path,
+              avatar: url,
               password: hash
             });
 
