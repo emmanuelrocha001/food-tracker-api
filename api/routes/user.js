@@ -10,7 +10,7 @@ const path = require('path');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // execute cb, pass potential error and path
-    cb(null, 'https:////food-tracker-api.herokuapp.com/uploads/');
+    cb(null, './uploads/');
 
   },
   filename: (req, file, cb) => {
