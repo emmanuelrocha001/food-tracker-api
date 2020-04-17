@@ -59,14 +59,13 @@ router.post('/signup', upload.single('avatar'), (req, res, next) => {
 
             console.log(hash);
             // const base = 'https://food-tracker-api.herokuapp.com'
-            const filePath = path.join(__dirname + '../../../uploads/' + req.file.filename );
 
             const user = new User({
               _id: new mongoose.Types.ObjectId(),
               email: req.body.email,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
-              avatar: filePath,
+              avatar: req.file.path,
               password: hash
             });
 
