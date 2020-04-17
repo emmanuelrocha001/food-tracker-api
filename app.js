@@ -4,12 +4,12 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require( 'mongoose' );
 const app = express();
-const multer = require('multer');
+// const multer = require('multer');
 const userRoutes = require( './api/routes/user' );
 // const Grid = require('gridfs-stream');
 // const multer  = require('multer');
 // const GridFSStorage = require('multer-gridfs-storage');
-upload = multer();
+// upload = multer();
 //connect database
 mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6fr.mongodb.net/test?retryWrites=true&w=majority',
 {
@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 // parse json data
 app.use(bodyParser.json()) ;
 // parse form data
-app.use(upload.array());
+// app.use(upload.array());
 
 // preventing cors errors
 app.use((req, res, next) => {

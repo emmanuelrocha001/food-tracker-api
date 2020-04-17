@@ -4,17 +4,31 @@ const User = require( '../models/user' );
 var bcrypt = require( 'bcryptjs' );
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
-// const multer  = require('multer');
+const multer  = require('multer');
 const GridFSStorage = require('multer-gridfs-storage');
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // execute cb, pass potential error and path
+    cb(null, './uploads/');
+
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
+  }
+});
 // Grid.mongo = mongoose.mongo;
 //connect database
-const connection = mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6fr.mongodb.net/test?retryWrites=true&w=majority',
-{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}
-);
+// const connection = mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6fr.mongodb.net/test?retryWrites=true&w=majority',
+// {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// }
+// );
 
+const upload = multer({storage: storage, limits: {
+  fileSize: 1024 * 1024 * 5
+}});
 
 // const upload = multer({dest: 'uploads/'});
 
@@ -22,8 +36,7 @@ const connection = mongoose.connect( 'mongodb+srv://user:rocha230067@jarvis-va6f
 // const upload = multer({ storage });
 
 
-router.post('/signup', (req, res, next) => {
-  console.log("hello");
+router.post('/signup', upload.single('avatar'), (req, res, next) => {
 
   User.find( {email: req.body.email} )
     .exec()
@@ -45,14 +58,15 @@ router.post('/signup', (req, res, next) => {
           } else {
 
             console.log(hash);
-            // console.log(req.profilePic);
+            const base = 'https://food-tracker-api.herokuapp.com'
+            const filePath = base + '/uploads/' + req.file.filename
 
             const user = new User({
               _id: new mongoose.Types.ObjectId(),
               email: req.body.email,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
-              avatar: req.body.avatar,
+              avatar: filePath,
               password: hash
             });
 
@@ -76,7 +90,7 @@ router.post('/signup', (req, res, next) => {
               });
           }
         });
-              
+
       }
     });
 });
