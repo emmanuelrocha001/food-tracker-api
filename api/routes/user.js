@@ -10,7 +10,7 @@ const path = require('path');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // execute cb, pass potential error and path
-    cb(null, path.join(__dirname + '../../../uploads/'));
+    cb(null, path.join( '/food-tracker-api' + '/uploads/'));
 
   },
   filename: (req, file, cb) => {
