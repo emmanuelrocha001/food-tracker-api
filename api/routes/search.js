@@ -22,8 +22,8 @@ router.post('/', (req, res, next) => {
             if( data["foods"][i]["brandOwner"] !== undefined) {
                 currentResult.brand = data["foods"][i]["brandOwner"];
             }
+            currentResult.totalHits = data["foods"][i]["totalHits"];
             results.push(currentResult);
-
         }
 
         // console.log(data["foods"][1]["foodNutrients"]);
@@ -31,14 +31,20 @@ router.post('/', (req, res, next) => {
 
 
 
-        
+
         res.status(201).json({
             totalHits: data["totalHits"],
             results: results
 
-          });
+        });
     })
     .catch( error =>{
+
+
+        res.status(500).json({
+            error: error
+        });
+
         console.log(error);
     });
 
