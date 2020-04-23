@@ -22,14 +22,6 @@ router.post('/', (req, res, next) => {
             if( data["foods"][i]["brandOwner"] !== undefined) {
                 currentResult.brand = data["foods"][i]["brandOwner"];
             }
-            
-            // data["foods"][i]["foodNutrients"].forEach( nutrient => {
-            //     if(nutrient["nutrientName"] === "Energy"){
-            //         currentResult.calories = nutrient["value"];
-            //     }
-            // });
-            
-            // 
             results.push(currentResult);
 
         }
