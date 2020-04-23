@@ -22,7 +22,6 @@ router.post('/', (req, res, next) => {
             if( data["foods"][i]["brandOwner"] !== undefined) {
                 currentResult.brand = data["foods"][i]["brandOwner"];
             }
-            currentResult.totalHits = data["foods"][i]["totalHits"];
             results.push(currentResult);
         }
 
