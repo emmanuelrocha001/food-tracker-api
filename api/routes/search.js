@@ -6,9 +6,30 @@ const axios = require('axios');
 var USDA_BASE_URL = "https://api.nal.usda.gov/fdc/v1/";
 var search_endpoint = USDA_BASE_URL + "foods/search/?api_key=" + process.env.USDA_KEY;
 // var individual_search_endpoint = USDA_BASE_URL + "/food/" + ""
+var detailed_endpoint = USDA_BASE_URL +'food/'
 
 
-router.post('/', (req, res, next) => {
+router.get('/:fdcid', (req, res) => {
+    axios
+        .get(USDA_BASE_URL + 'food/' + req.params.fdcid + '/?api_key=' + process.env.USDA_KEY)
+        .then( response => response["data"]).then( data => {
+            console.log(data);
+            res.status(200).json({
+                success: true
+            });
+
+        })
+        .catch( error =>{
+            res.status(500).json({
+                error: error
+            });
+
+            console.log(error);
+        });
+
+
+});
+router.post('/', (req, res) => {
 
 
     axios.post(search_endpoint, {query: req.body.query, pageSize: req.body.pageSize, pageNumber: req.body.pageNumber})
