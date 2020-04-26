@@ -151,13 +151,14 @@ router.post('/', (req, res) => {
         // get more detailed info
         var results = [];
         for(var i=0; i<req.body.pageSize;i++) {
-            var currentResult = {};
-            currentResult.fdcId = data["foods"][i]["fdcId"]
-            currentResult.description = data["foods"][i]["description"]
-            if( data["foods"][i]["brandOwner"] !== undefined) {
-                currentResult.brand = data["foods"][i]["brandOwner"];
-            }
-            results.push(currentResult);
+            // var currentResult = {};
+            // currentResult.fdcId = data["foods"][i]["fdcId"]
+            // currentResult.description = data["foods"][i]["description"]
+            // if( data["foods"][i]["brandOwner"] !== undefined) {
+            //     currentResult.brand = data["foods"][i]["brandOwner"];
+            // }
+            // results.push(currentResult);
+            results.push(data["foods"][i]["fdcId"]);
         }
 
         // console.log(data["foods"][1]["foodNutrients"]);
