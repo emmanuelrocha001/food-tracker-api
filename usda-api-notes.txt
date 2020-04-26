@@ -1,0 +1,58 @@
+* required data points
+
+minimal result data structure:
+----------------------------------------------->
+fdcId: string *
+description(item name): string *
+brand: string( optional, if datatype is branded)
+calories: number *
+serving size: number *
+serving size unit: string *
+
+
+
+
+How to retrieve data from queried item ----------------------------------------------->
+// query 1.5 top results( only pick 1(filter out items that lack required data points
+// only query Branded and SR Legacy items
+
+
+
+// required data that is always present
+fdcId -> fdcId
+description(item name) -> description
+
+
+Branded
+----------------------------------------------->
+// brand( for now discard branded items without labelNutrients, servingSize, servingSizeUnit)
+(1): data["brandOwner"]
+
+// calories
+(1): data["labelNutrients"]["calories"] // use for item expansion if available
+(2): foodNutrients["nutrient"]["number"] check for id: 1008 name: "Energy" unitName: "kcal" // 100 grams
+
+// servingSize
+(1): data["servingSize"]
+
+// servingSizeUnit
+(2): data["servingSizeUnit"]
+
+
+SR Legacy(food nutrients are )
+----------------------------------------------->
+// calories
+100 g is base ammount for nutrient information
+(data["foodPortions"][indece]["gramWeight"]/100) * foodNutrient with id 1008["amount]
+
+
+// servingSize + servingSizeUnit
+data["foodPortions"] array of portions
+data["foodPortions"][indece]["amount"]
+data["foodPortions"][indece]["modifier"]
+// in grams
+data["foodPortions"][indece]["modifier"]
+
+calories conversions
+data["foodPortions"][indece]["gramWeight"]
+-------------------------------------------->
