@@ -4,6 +4,14 @@ const axios = require('axios');
 
 
 var USDA_BASE_URL = "https://api.nal.usda.gov/fdc/v1/";
+function toTitleCase(original) {
+    var new_string = original.toLowerCase().split(' ').map( word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    if(new_string.length > 45){
+        return new_string.substring(0, 45) + "...";
+    } else {
+        return new_string;
+    }
+}
 
 router.post('/foods', (req, res) =>  {
 
@@ -29,7 +37,7 @@ router.post('/foods', (req, res) =>  {
 
             // logic for branded items
             if(item["dataType"] === 'Branded') {
-                if(item["BrandOwner"] === undefined || item["servingSize"] === undefined || item["servingSize"] === undefined || item["servingSizeUnit"] === undefined || item["labelNutrients"]["calories"] === undefined) {
+                if(item["description"] === undefined || item["BrandOwner"] === undefined || item["servingSize"] === undefined || item["servingSize"] === undefined || item["servingSizeUnit"] === undefined || item["labelNutrients"]["calories"] === undefined) {
                     foodItem.brand = item["brandOwner"];
                     foodItem.servingSize = item["servingSize"];
                     foodItem.servingSizeUnit = item["servingSizeUnit"];
@@ -37,17 +45,17 @@ router.post('/foods', (req, res) =>  {
 
                      // check for serving size and unit and calories
                     if(item["servingSizeText"] !== undefined) {
-                        foodItem.serving = "" + item["servingSizeText"] + "(" + item["servingSize"] + " " + item["servingSizeUnit"] + ")";
+                        foodItem.serving = "" + toTitleCase(item["servingSizeText"]) + "(" + item["servingSize"] + " " + item["servingSizeUnit"] + ")";
                     } else if(item["householdServingFullText"] !== undefined){
-                        foodItem.serving = "" + item["householdServingFullText"] + "(" + item["servingSize"] + " " + item["servingSizeUnit"] + ")";
+                        foodItem.serving = "" + toTitleCase(item["householdServingFullText"]) + "(" + item["servingSize"] + " " + item["servingSizeUnit"] + ")";
                     }else {
                         foodItem.serving = "" + item["servingSize"] + " " + item["servingSizeUnit"];
                     }
 
 
                     // used for cliet display
-                    foodItem.topLeft = foodItem.description;
-                    foodItem.bottomLeft = item["brandOwner"] + ', ' + foodItem.serving;
+                    foodItem.topLeft = toTitleCase(foodItem.description);
+                    foodItem.bottomLeft = toTitleCase(item["brandOwner"]) + ', ' + foodItem.serving;
                     foodItem.bottomRight = foodItem.calories;
 
                 } else {
