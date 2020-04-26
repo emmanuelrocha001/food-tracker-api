@@ -6,27 +6,73 @@ const axios = require('axios');
 var USDA_BASE_URL = "https://api.nal.usda.gov/fdc/v1/";
 
 router.post('/foods', (req, res) =>  {
-    console.log( req.params.fdcids);
+
     var fdcids_string = "";
-    req.params.fdcids.forEach( id => {
+    req.query.fdcids.forEach( id => {
         fdcids_string = fdcids_string + "&fdcIds=" + id;
     });
+
     axios
-        .get(USDA_BASE_URL + 'foods' + '/?api_key=' + process.env.USDA_KEY + fdcids_string)
-        .then( response => response["data"]).then( data => {
-            res.status(200).json({
-                resultsDetailed: data
-            });
+    .get(USDA_BASE_URL + 'foods' + '/?api_key=' + process.env.USDA_KEY + fdcids_string)
+    .then( response => response["data"]).then( data => {
 
-        })
-        .catch( error =>{
-            res.status(500).json({
-                error: error
-            });
+        detailedResults = [];
+        data.forEach( item => {
+            var item_meets_requirements = true;
+            var foodItem = {};
+            // fdcId
+            foodItem.fdcId = item["fdcId"];
+            // description
+            foodItem.description = item["description"];
+            // brand( set to null by default)
+            foodItem.brand = ""
 
-            console.log(error);
+            // logic for branded items
+            if(item["dataType"] === 'Branded') {
+                if(item["BrandOwner"] === undefined || item["servingSize"] === undefined || item["servingSize"] === undefined || item["servingSizeUnit"] === undefined || item["labelNutrients"]["calories"] === undefined) {
+                    foodItem.brand = item["brandOwner"];
+                    foodItem.servingSize = item["servingSize"];
+                    foodItem.servingSizeUnit = item["servingSizeUnit"];
+                    foodItem.calories = item["labelNutrients"]["calories"]["value"];
+
+                     // check for serving size and unit and calories
+                    if(item["servingSizeText"] !== undefined) {
+                        foodItem.serving = "" + item["servingSizeText"] + "(" + item["servingSize"] + " " + item["servingSizeUnit"] + ")";
+                    } else if(item["householdServingFullText"] !== undefined){
+                        foodItem.serving = "" + item["householdServingFullText"] + "(" + item["servingSize"] + " " + item["servingSizeUnit"] + ")";
+                    }else {
+                        foodItem.serving = "" + item["servingSize"] + " " + item["servingSizeUnit"];
+                    }
+
+
+                    // used for cliet display
+                    foodItem.topLeft = foodItem.description;
+                    foodItem.bottomLeft = item["brandOwner"] + ', ' + foodItem.serving;
+                    foodItem.bottomRight = foodItem.calories;
+
+                } else {
+                    item_meets_requirements = false;
+                }
+            } else {
+                item_meets_requirements = false;
+            }
+
+            if(item_meets_requirements === true) {
+                detailedResults.push(foodItem);
+            }
+
+    });
+    res.status(200).json({
+        detailedResults: detailedResults
+    });
+
+    })
+    .catch( error =>{
+        res.status(500).json({
+            error: error
         });
 
+    });
 
 });
 
@@ -97,7 +143,9 @@ router.get('/:fdcid', (req, res) => {
 
 router.post('/', (req, res) => {
 
-    var dataTypes = [ 'Branded', 'SR Legacy'];
+    // var dataTypes = [ 'Branded', 'SR Legacy'];
+    var dataTypes = [ 'Branded'];
+
     axios.post(USDA_BASE_URL + "foods/search/?api_key=" + process.env.USDA_KEY, {query: req.body.query,  dataType: dataTypes, pageSize: req.body.pageSize, pageNumber: req.body.pageNumber})
     .then( response => response["data"]).then( data => {
         // get more detailed info
