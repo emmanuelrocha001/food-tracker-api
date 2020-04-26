@@ -69,7 +69,8 @@ router.post('/foods', (req, res) =>  {
     })
     .catch( error =>{
         res.status(500).json({
-            error: error
+            error: error,
+            detailedResults: []
         });
 
     });
@@ -89,7 +90,7 @@ router.get('/:fdcid', (req, res) => {
             // description
             foodItem.description = data["description"];
             // brand( set to null by default)
-            foodItem.brand = ""
+            // foodItem.brand = ""
 
             // logic for branded items
             if(data["dataType"] === 'Branded') {
@@ -132,7 +133,7 @@ router.get('/:fdcid', (req, res) => {
         })
         .catch( error =>{
             res.status(500).json({
-                error: error
+                error: error,
             });
 
             console.log(error);
