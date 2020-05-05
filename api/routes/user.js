@@ -137,7 +137,7 @@ router.post('/login', (req, res, next) => {
             return res.status(200).json({
               successful: true,
               user: {
-                name: user[0].firstName,
+                firstName: user[0].firstName,
                 lastName: user[0].lastName,
                 userId: user[0]._id,
                 avatar: user[0].avatar,
@@ -155,6 +155,55 @@ router.post('/login', (req, res, next) => {
         });
       }
     });
+});
+
+
+router.patch('/:userId', ( req, res, next ) => {
+  const id = req.params.userId;
+  const updateOps = {};
+
+  for (const ops of req.body) {
+      updateOps[ops.propName] = ops.value;
+  }
+
+  User
+      .update({_id: id}, { $set: updateOps})
+      .exec()
+      .then(result => {
+
+        User.findById( id )
+        .select()
+        .exec()
+        .then(doc => {
+            res.status(200).json({
+              user: {
+                firstName: doc.firstName,
+                lastName: doc.lastName,
+                userId: doc._id,
+                avatar: doc.avatar,
+                email: doc.email,
+              }
+          });
+
+        })
+        .catch(err => {
+          console.log(err);
+          res.status(500).json({error : err})
+        });
+
+          // console.log(result);
+          // res.status(200).json({
+          //   successful: true,
+          //   message: 'Profile Successfully Updated',
+          // });
+      })
+      .catch(err => {
+          console.log(err);
+          res.status(500).json({
+          successful: false,
+          error: err
+          });
+  });
 });
 
 //export such that module can be used in other files
