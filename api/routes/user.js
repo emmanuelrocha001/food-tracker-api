@@ -142,6 +142,7 @@ router.post('/login', (req, res, next) => {
                 userId: user[0]._id,
                 avatar: user[0].avatar,
                 email: user[0].email,
+                weight: user[0].weight
               },
               message: 'Authentication successful',
             });
@@ -182,6 +183,7 @@ router.patch('/:userId', ( req, res, next ) => {
                 userId: doc._id,
                 avatar: doc.avatar,
                 email: doc.email,
+                weight: doc.weight
               }
           });
 
