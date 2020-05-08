@@ -69,8 +69,8 @@ router.post('/signup/:token', (req, res, next) => {
     .verifyIdToken({idToken: token,audience: process.env.CLIENT_ID})
     .then( ticket => {
       const payload = ticket.getPayload();
-
-      if(payload["aud"].localeCompare(process.env.CLIENT_ID)) {
+      // payload["aud"].localeCompare(process.env.CLIENT_ID)
+      if(true) {
 
         User.find( {googleId: payload["sub"]} )
         .exec()
@@ -142,8 +142,8 @@ router.post('/login/:token', (req, res, next) => {
     .verifyIdToken({idToken: token,audience: process.env.CLIENT_ID})
     .then( ticket => {
       const payload = ticket.getPayload();
-
-      if(payload["aud"].localeCompare(process.env.CLIENT_ID)) {
+      // payload["aud"].localeCompare(process.env.CLIENT_ID)
+      if(true) {
         User.find( {googleId: payload["sub"]} )
         .exec()
         .then(user => {
