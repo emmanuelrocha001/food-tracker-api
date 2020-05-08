@@ -14,6 +14,12 @@ const router = express.Router();
 const User = require( '../models/user' );
 var bcrypt = require( 'bcryptjs' );
 const mongoose = require('mongoose');
+
+
+// google token validation
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client(process.env.CLIENT_ID);
+
 const Grid = require('gridfs-stream');
 const multer  = require('multer');
 var multerS3 = require('multer-s3')
@@ -35,9 +41,6 @@ const storage = multer.diskStorage({
 });
 
 
-
-
-
 const upload = multer({storage: storage, limits: {
   fileSize: 1024 * 1024 * 5
 }});
@@ -56,10 +59,132 @@ const uploads = multer({
 
   })
 
-
 })
 
+// sign up with google
+router.post('/signup/:token', (req, res, next) => {
 
+  const token = req.params.token;
+  client
+    .verifyIdToken({idToken: token,audience: process.env.CLIENT_ID})
+    .then( ticket => {
+      const payload = ticket.getPayload();
+
+      if(payload["aud"].localeCompare(process.env.CLIENT_ID)) {
+
+        User.find( {googleId: payload["sub"]} )
+        .exec()
+        .then(user => {
+          if (user.length >= 1) {
+            return res.status(409).json({
+              successful: false,
+              message: 'Sign in with Google, account is already linked'
+            });
+          } else {
+            const user = new User({
+              _id: new mongoose.Types.ObjectId(),
+              email: payload["email"],
+              firstName: payload["given_name"],
+              lastName: payload["family_name"],
+              isGoogleAccountLinked: true,
+              googleId: payload["sub"]
+            });
+            user
+            .save()
+            .then( result => {
+              res.status(201).json({
+                user: result,
+                message: 'account successfuly created and linked with google account',
+              });
+    
+            })
+            .catch(err=> {
+              console.log(err);
+              res.status(500).json({
+                error: err
+              });
+        
+            });
+          }
+
+        })
+        .catch(err=> {
+          console.log(err);
+          res.status(500).json({
+            error: err
+          });
+    
+        });
+        
+      } else {
+        res.status(401).json({
+          error: "token could not be verified",
+          payload: payload
+        });
+      }
+    })
+    .catch(err=> {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+
+    });
+
+});
+
+
+
+router.post('/login/:token', (req, res, next) => {
+
+  const token = req.params.token;
+  client
+    .verifyIdToken({idToken: token,audience: process.env.CLIENT_ID})
+    .then( ticket => {
+      const payload = ticket.getPayload();
+
+      if(payload["aud"].localeCompare(process.env.CLIENT_ID)) {
+        User.find( {googleId: payload["sub"]} )
+        .exec()
+        .then(user => {
+          if (user.length < 1) {
+            return res.status(409).json({
+              successful: false,
+              message: 'Sign up with Google, account is not linked'
+            });
+          } else {
+            return res.status(200).json({
+              user: user[0]
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+
+          return res.status(500).json({
+            successful: false,
+            error: err
+          });
+        });
+
+      } else {
+        res.status(401).json({
+          error: "token could not be verified",
+          payload: payload
+        });
+      }
+
+    })
+    .catch(err => {
+      console.log(err);
+
+      return res.status(500).json({
+        successful: false,
+        error: err
+      });
+    });
+
+});
 
 router.post('/signup', uploads.single('avatar'), (req, res, next) => {
 
