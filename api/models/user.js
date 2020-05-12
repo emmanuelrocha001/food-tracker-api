@@ -14,7 +14,6 @@ const userSchema = mongoose.Schema({
     lastName: {type: String, required: true},
     password: {type: String, required: false},
     avatar: {type: String, default: "" },
-    isGoogleAccountLinked: {type: Boolean, default: false},
     googleId: {type: String, required: false},
     weight: {type: Number, default: 0, min:0, max: 2000}
 
