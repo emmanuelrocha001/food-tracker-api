@@ -275,22 +275,24 @@ router.patch('/pic/:userId', uploads.single('avatar'), (req, res, next) => {
   .find({_id: req.params.userId})
   .then( user => {
 
-    // delete old profile pic
-    var old= user[0]["avatar"].replace('https://food-tracker-api-storage.s3.us-east-2.amazonaws.com/', '');
-    var bucket = 'food-tracker-api-storage';
-    var params = {
-      Bucket: bucket ,
-      Key: old
-    };
-    s3.deleteObject(params, function(error,data) {
-      if(error) {
-        console.log(error);
-        res.status(500).json({
-          error: error
-        });
-      } 
+    // delete old profile pic(if one exists)
+    if(user[0]["avatar"] !== "") {
+      var old= user[0]["avatar"].replace('https://food-tracker-api-storage.s3.us-east-2.amazonaws.com/', '');
+      var bucket = 'food-tracker-api-storage';
+      var params = {
+        Bucket: bucket ,
+        Key: old
+      };
+      s3.deleteObject(params, function(error,data) {
+        if(error) {
+          console.log(error);
+          res.status(500).json({
+            error: error
+          });
+        } 
+      });
 
-    });
+    }
 
     // update profile pic url
     var url = 'https://food-tracker-api-storage.s3.us-east-2.amazonaws.com/' + req.file.key;
