@@ -12,6 +12,7 @@ var cors = require('cors');
 // routes
 const userRoutes = require('./api/routes/user');
 const searchRoutes = require('./api/routes/search');
+const milestoneRoutes = require('./api/routes/milestone');
 
 
 //connect database
@@ -40,6 +41,7 @@ app.use(cors());
 //request logger
 
 app.use( '/user', userRoutes );
+app.use('/milestone', milestoneRoutes);
 app.use( '/search', searchRoutes);
 
 //error handling

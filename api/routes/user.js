@@ -1,10 +1,8 @@
 const express = require('express');
+
+// aws configuration
 const aws = require('aws-sdk');
-// const S3_BUCKET = process.env.S3_BUCKET;
 aws.config.region = 'us-east-2';
-
-
-// for deployment
 aws.config.update({
   accessKeyId: process.env.S3_KEY,
   secretAccessKey: process.env.S3_SECRET
@@ -21,16 +19,9 @@ const mongoose = require('mongoose');
 const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client(process.env.CLIENT_ID);
 
-const Grid = require('gridfs-stream');
+// file uploads
 const multer  = require('multer');
-var multerS3 = require('multer-s3')
-const GridFSStorage = require('multer-gridfs-storage');
-const path = require('path');
-
-
-
-
-
+var multerS3 = require('multer-s3');
 const uploads = multer({
   storage: multerS3({
     s3: s3,
@@ -41,10 +32,8 @@ const uploads = multer({
     key: function (req, file, cb) {
       cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
     }
-
   })
-
-})
+});
 
 // sign up with google
 router.post('/signup/:token', (req, res, next) => {
@@ -310,10 +299,12 @@ router.patch('/pic/:userId', uploads.single('avatar'), (req, res, next) => {
         });
 
       })
-      // .catch(err => {
-      //   console.log(err);
-      //   res.status(500).json({error : err})
-      // });
+      .catch(error => {
+        console.log(error);
+        res.status(500).json({
+          error: error
+        });
+      });
 
     })
     .catch(error => {
