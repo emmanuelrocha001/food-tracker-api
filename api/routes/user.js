@@ -1,14 +1,15 @@
 const express = require('express');
 const aws = require('aws-sdk');
 // const S3_BUCKET = process.env.S3_BUCKET;
-const s3 = new aws.S3();
 aws.config.region = 'us-east-2';
+
 
 // for deployment
 aws.config.update({
   accessKeyId: process.env.S3_KEY,
-  secretAccessKey: process.env.S3_SECRET,
+  secretAccessKey: process.env.S3_SECRET
 });
+const s3 = new aws.S3();
 
 const router = express.Router();
 const User = require( '../models/user' );
@@ -28,22 +29,6 @@ const path = require('path');
 
 
 
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // execute cb, pass potential error and path
-    cb(null, path.join( './uploads'));
-
-  },
-  filename: (req, file, cb) => {
-    cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
-  }
-});
-
-
-const upload = multer({storage: storage, limits: {
-  fileSize: 1024 * 1024 * 5
-}});
 
 
 const uploads = multer({
@@ -69,7 +54,11 @@ router.post('/signup/:token', (req, res, next) => {
     .verifyIdToken({idToken: token,audience: process.env.CLIENT_ID})
     .then( ticket => {
       const payload = ticket.getPayload();
+
+
       // payload["aud"].localeCompare(process.env.CLIENT_ID)
+      
+      
       if(true) {
 
         User.find( {googleId: payload["sub"]} )
@@ -245,6 +234,8 @@ router.post('/signup', uploads.single('avatar'), (req, res, next) => {
 });
 
 
+
+
 router.post('/login', (req, res, next) => {
 
   User.find( {email: req.body.email} )
@@ -277,6 +268,71 @@ router.post('/login', (req, res, next) => {
 });
 
 
+router.patch('/pic/:userId', uploads.single('avatar'), (req, res, next) => { 
+  // delete current profile pic
+
+  User
+  .find({_id: req.params.userId})
+  .then( user => {
+
+    // delete old profile pic
+    var old= user[0]["avatar"].replace('https://food-tracker-api-storage.s3.us-east-2.amazonaws.com/', '');
+    var bucket = 'food-tracker-api-storage';
+    var params = {
+      Bucket: bucket ,
+      Key: old
+    };
+    s3.deleteObject(params, function(error,data) {
+      if(error) {
+        console.log(error);
+        res.status(500).json({
+          error: error
+        });
+      } 
+
+    });
+
+    // update profile pic url
+    var url = 'https://food-tracker-api-storage.s3.us-east-2.amazonaws.com/' + req.file.key;
+    User
+    .update({_id: req.params.userId}, {$set: { avatar: url }})
+    .exec()
+    .then(result => {
+
+      User.findById( req.params.userId)
+      .select()
+      .exec()
+      .then(doc => {
+          res.status(200).json({
+            user: doc
+        });
+
+      })
+      // .catch(err => {
+      //   console.log(err);
+      //   res.status(500).json({error : err})
+      // });
+
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        error: error
+      });
+    });
+
+
+
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(500).json({
+      error: error
+    });
+  });
+
+});
+
 router.patch('/:userId', ( req, res, next ) => {
   const id = req.params.userId;
   const updateOps = {};
@@ -295,14 +351,7 @@ router.patch('/:userId', ( req, res, next ) => {
         .exec()
         .then(doc => {
             res.status(200).json({
-              user: {
-                firstName: doc.firstName,
-                lastName: doc.lastName,
-                userId: doc._id,
-                avatar: doc.avatar,
-                email: doc.email,
-                weight: doc.weight
-              }
+              user: doc
           });
 
         })
@@ -310,12 +359,6 @@ router.patch('/:userId', ( req, res, next ) => {
           console.log(err);
           res.status(500).json({error : err})
         });
-
-          // console.log(result);
-          // res.status(200).json({
-          //   successful: true,
-          //   message: 'Profile Successfully Updated',
-          // });
       })
       .catch(err => {
           console.log(err);
@@ -325,6 +368,5 @@ router.patch('/:userId', ( req, res, next ) => {
           });
   });
 });
-
 //export such that module can be used in other files
 module.exports = router;
