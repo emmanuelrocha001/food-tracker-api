@@ -90,6 +90,7 @@ router.get('/:userId', (req, res) => {
             }
             else{
             res.status(404).json({
+                milestones: [],
                 message: 'No entries found'
             });
             }
