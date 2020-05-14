@@ -77,7 +77,7 @@ router.post('/:userId', uploads.single('pic'), (req, res) => {
 // get user milestones
 router.get('/:userId', (req, res) => {
 
-    Milestone.find()
+    Milestone.find({userId: req.params.userId})
         .select()
         .sort( { date: 'desc' } )
         .exec()
